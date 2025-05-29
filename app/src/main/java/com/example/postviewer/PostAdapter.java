@@ -1,7 +1,5 @@
 package com.example.postviewer;
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,45 +9,58 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
-    private List<Post> postList;
-    private Context context;
 
-    public PostAdapter(List<Post> postList, Context context) {
-        this.postList = postList;
-        this.context = context;
+    private List<Post> posts;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Post post);
+    }
+
+    public PostAdapter(List<Post> posts, OnItemClickListener listener) {
+        this.posts = posts;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        Post post = postList.get(position);
-        holder.textView.setText(post.getTitle());
+        Post post = posts.get(position);
+        holder.titleTextView.setText(post.getTitle());
+
+        String body = post.getBody();
+        if (body.length() > 100) {
+            body = body.substring(0, 100) + "...";
+        }
+        holder.bodyTextView.setText(body);
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetailActivity.class);
-            intent.putExtra("postId", post.getId());
-            context.startActivity(intent);
+            if (listener != null) {
+                listener.onItemClick(post);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return postList.size();
+        return posts != null ? posts.size() : 0;
     }
 
-    static class PostViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+    public static class PostViewHolder extends RecyclerView.ViewHolder {
+        TextView titleTextView;
+        TextView bodyTextView;
 
-        public PostViewHolder(View itemView) {
+        public PostViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            titleTextView = itemView.findViewById(R.id.titleTextView);
+            bodyTextView = itemView.findViewById(R.id.bodyTextView);
         }
     }
 }
-

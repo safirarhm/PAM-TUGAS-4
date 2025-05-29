@@ -1,11 +1,13 @@
 package com.example.postviewer;
 
+import com.google.firebase.appdistribution.gradle.ApiService;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClient {
+public class ApiClient {
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com/";
-    private static Retrofit retrofit = null;
+    private static Retrofit retrofit;
 
     public static ApiService getApiService() {
         if (retrofit == null) {
